@@ -11,6 +11,8 @@ jobs:
   check-label:
     name: Require release label
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     outputs:
       bump: ${{ steps.detect.outputs.bump }}
 
