@@ -1,0 +1,45 @@
+name: Reusable · Label Check
+
+on:
+  workflow_call:
+    outputs:
+      bump:
+        description: "Tipo de bump detectado: major | minor | patch"
+        value: ${{ jobs.check-label.outputs.bump }}
+
+jobs:
+  check-label:
+    name: Require release label
+    runs-on: ubuntu-latest
+    outputs:
+      bump: ${{ steps.detect.outputs.bump }}
+
+    steps:
+      - name: Check release label
+        id: detect
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labels = context.payload.pull_request?.labels?.map(l => l.name) ?? [];
+
+            const major = labels.some(l => l.includes('Major'));
+            const minor = labels.some(l => l.includes('Minor'));
+            const patch = labels.some(l => l.includes('Patch'));
+
+            if (!major && !minor && !patch) {
+              core.setFailed(
+                'La PR necesita exactamente uno de estos labels: ' +
+                '💥 Major · ✨ Minor · 🐛 Patch'
+              );
+              return;
+            }
+
+            const count = [major, minor, patch].filter(Boolean).length;
+            if (count > 1) {
+              core.setFailed('La PR tiene más de un label de release. Deja solo uno.');
+              return;
+            }
+
+            const bump = major ? 'major' : minor ? 'minor' : 'patch';
+            core.setOutput('bump', bump);
+            console.log(`Label detectado: ${bump}`);
