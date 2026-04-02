@@ -1,0 +1,19 @@
+name: Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  label-check:
+    if: github.event.pull_request.merged == true
+    uses: ChrisCorrea94/linkers-android-ci-workflows/.github/workflows/reusable-label-check.yml@v1.0.0
+
+  release:
+    needs: label-check
+    uses: ChrisCorrea94/linkers-android-ci-workflows/.github/workflows/reusable-android-release.yml@v1.0.0
+    with:
+      bump: ${{ needs.label-check.outputs.bump }}
+    secrets:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
