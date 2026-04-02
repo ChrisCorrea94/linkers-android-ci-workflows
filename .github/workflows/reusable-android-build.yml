@@ -12,6 +12,11 @@ on:
         required: false
         type: boolean
         default: false
+      run-tests:
+        description: "Ejecutar unit tests del módulo"
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -43,6 +48,17 @@ jobs:
 
       - name: Assemble Debug
         run: ./gradlew :${{ inputs.module }}:assembleDebug
+
+      - name: Unit Tests
+        if: inputs.run-tests
+        run: ./gradlew :${{ inputs.module }}:test
+
+      - name: Upload test results
+        if: inputs.run-tests && failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ inputs.module }}
+          path: ${{ inputs.module }}/build/reports/tests/
 
       - name: Lint
         if: inputs.run-lint
