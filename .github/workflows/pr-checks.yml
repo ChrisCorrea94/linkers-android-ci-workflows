@@ -1,0 +1,12 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  label-check:
+    # Llama a la versión estable de sí mismo (pinned a tag)
+    # Usar la versión en producción para validar PRs evita que un PR roto
+    # pueda desactivar su propia validación.
+    uses: ChrisCorrea94/linkers-android-ci-workflows/.github/workflows/reusable-label-check.yml@v1.0.0
