@@ -17,6 +17,10 @@ on:
         required: false
         type: boolean
         default: true
+    secrets:
+      GPR_KEY:
+        description: "Token para leer GitHub Packages (usa secrets.GITHUB_TOKEN)"
+        required: false
 
 jobs:
   build:
@@ -24,6 +28,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      GPR_USER: ${{ github.actor }}
+      GPR_KEY: ${{ secrets.GPR_KEY }}
 
     steps:
       - name: Checkout
