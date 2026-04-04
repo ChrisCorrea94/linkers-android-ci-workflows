@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       version:
-        description: "Versión a publicar (ej: v0.10.1)"
+        description: "Versión a publicar — con o sin prefijo v (ej: v0.10.2 o 0.10.2). La v se elimina automáticamente."
         required: true
         type: string
       registry_url:
@@ -47,6 +47,12 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
+      - name: Compute version without v prefix
+        id: version
+        run: |
+          VERSION="${{ inputs.version }}"
+          echo "value=${VERSION#v}" >> $GITHUB_OUTPUT
+
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
@@ -55,4 +61,4 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
-          RELEASE_VERSION: ${{ inputs.version }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
