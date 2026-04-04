@@ -11,6 +11,10 @@ on:
       GH_TOKEN:
         description: "Token con permisos de escritura para crear tags y releases"
         required: true
+    outputs:
+      version:
+        description: "Versión creada sin prefijo v (ej: 0.10.2)"
+        value: ${{ jobs.release.outputs.version }}
 
 jobs:
   release:
@@ -18,6 +22,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    outputs:
+      version: ${{ steps.next-version.outputs.next_clean }}
 
     steps:
       - name: Checkout
@@ -56,7 +62,9 @@ jobs:
           fi
 
           NEXT="v${MAJOR}.${MINOR}.${PATCH}"
+          NEXT_CLEAN="${MAJOR}.${MINOR}.${PATCH}"
           echo "next=$NEXT" >> $GITHUB_OUTPUT
+          echo "next_clean=$NEXT_CLEAN" >> $GITHUB_OUTPUT
           echo "Próximo tag: $NEXT"
 
       - name: Configure git
